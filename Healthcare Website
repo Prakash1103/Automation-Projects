@@ -1,0 +1,211 @@
+package SeleniumProject;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class HealthCare {
+
+	public static void main(String[] args) throws InterruptedException {
+		// TODO Auto-generated method stub
+		
+		System.setProperty("webdriver.chrome.driver", "D:\\Software Master\\driver\\chromedriver-win64\\chromedriver.exe");
+        
+		WebDriver driver=new ChromeDriver();
+		//To Maximize the window 
+		driver.manage().window().maximize();
+		//Implicit wait 
+		driver.manage().timeouts().implicitlyWait(10,TimeUnit.SECONDS);
+		//Base URL
+		String baseurl="https://katalon-demo-cura.herokuapp.com/";
+		//Load URL into Browser
+		driver.get(baseurl);
+		int Testpassed=0;
+		int Testfailed=0;
+		//Expected Results 
+		String ExpectedHomepagetitle="CURA Healthcare Service";
+		String ExpectedLoginurl="https://katalon-demo-cura.herokuapp.com/profile.php#login";
+		String ExpectedConfirmationpageurl="https://katalon-demo-cura.herokuapp.com/appointment.php#summary";
+		String ExpectedFacilty="Hongkong CURA Healthcare Center";
+	    String ExpectedHospitalreadmission="Yes";
+	    String ExpectedHealthcareprogram="Medicaid";
+	    String ExpectedVisitdate="03/08/2024";
+	    String Expectedcomment="Suffering from Cold and high fever";
+		//Confirm Homepage
+		
+		String ActualHomepagetitle=driver.getTitle();
+		if (ActualHomepagetitle.equals(ExpectedHomepagetitle)){
+			System.out.println("Test_001 Passed- Navigates to Homepage");
+			Testpassed++;
+		}
+		else {
+			System.out.println("Test_001 Failed- Does not Navigates to Homepage");
+			Testfailed++;
+		}
+		
+		driver.findElement(By.id("btn-make-appointment")).click();
+		
+		//Navigation to Login
+		
+		String ActualLoginurl=driver.getCurrentUrl();
+		if (ActualLoginurl.equals(ExpectedLoginurl)) {
+			System.out.println("Test_002 Passed- Navigates to Loginpage");
+			Testpassed++;
+		}
+		else {
+			System.out.println("Test_002 Failed-Does not Navigates to Loginpage");
+			Testfailed++;
+		}
+		 Thread.sleep(3000);
+		//Login page
+		String username= driver.findElement(By.xpath("(//span[@id='demo_username_label']/following::input)[1]")).getAttribute("value");
+		String password=driver.findElement(By.xpath("(//span[@id='demo_password_label']/following::input)[1]")).getAttribute("value");
+		
+		driver.findElement(By.id("txt-username")).sendKeys(username);
+		driver.findElement(By.id("txt-password")).sendKeys(password);
+		driver.findElement(By.id("btn-login")).click();
+	    Thread.sleep(3000);
+		//Make Appointment
+		String Expectedappointmentpageurl="https://katalon-demo-cura.herokuapp.com/#appointment";
+		String ActualAppointmentpageurl=driver.getCurrentUrl();
+		
+		if(ActualAppointmentpageurl.equals(Expectedappointmentpageurl)) {
+			System.out.println("Test_003 Passed- Navigates to Appointment Page");
+			Testpassed++;
+		}
+		else {
+			System.out.println("Test_003 Failed- Does not Navigates to Appointment Page");
+			Testfailed++;
+		}
+		
+		//Facility drop down
+		WebElement facilitydropdown=driver.findElement(By.id("combo_facility"));
+		Select facilitydropdownlist=new Select(facilitydropdown);
+		facilitydropdownlist.selectByValue("Hongkong CURA Healthcare Center");
+		 Thread.sleep(3000);
+		//Apply for hospital readmission checkbox 
+		
+		driver.findElement(By.id("chk_hospotal_readmission")).click();
+		//Health care program radio button
+        driver.findElement(By.xpath("//label[@class='radio-inline']//input[@id='radio_program_medicaid']")).click();
+        Thread.sleep(3000);
+        //Visit Date (Required)
+        driver.findElement(By.xpath("(//input[@id='txt_visit_date']/following::span)[1]")).click();
+        Thread.sleep(3000);
+       
+        String MonthandYear=driver.findElement(By.xpath("(//th[@class='datepicker-switch'])[1]")).getText();
+        WebDriverWait wait=new WebDriverWait(driver,20);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.className("datepicker-switch")));
+        
+        while(!(MonthandYear.equals("August 2024"))) {
+        	driver.findElement(By.xpath("(//th[@class='next'])[1]")).click();
+        	MonthandYear=driver.findElement(By.xpath("(//th[@class='datepicker-switch'])[1]")).getText();
+        }
+        Thread.sleep(3000);
+        driver.findElement(By.xpath("//td[@class='day' and text()='3']")).click();
+        
+        //Comment Text field
+        Thread.sleep(3000);
+        driver.findElement(By.id("txt_comment")).sendKeys("Suffering from Cold and high fever");
+        
+        //Book Appointment button
+        Thread.sleep(3000);
+        driver.findElement(By.id("btn-book-appointment")).click();
+        
+        String ActualConfirmationpageurl=driver.getCurrentUrl();
+        if (ExpectedConfirmationpageurl.equals(ActualConfirmationpageurl)) {
+        	System.out.println("Test_004 Passed- Navigates to Confirmation Page");
+        	Testpassed++;
+        }
+        else {
+        	System.out.println("Test_004 Failed- Does not Navigates to Confirmation Page");
+        	Testfailed++;
+        }
+        
+        //validation
+        
+        //Facility
+        String ActualFacility=driver.findElement(By.id("facility")).getText();
+        if(ActualFacility.equals(ExpectedFacilty)) {
+        	System.out.println("Test_005 Passed- Expected facilty has been selected in dropdown");
+        	Testpassed++;
+        }
+        else {
+        	System.out.println("Test_005 failed- Expected facilty  has not been selected in dropdown");
+        	Testfailed++;
+        }
+        //Apply for hospital readmission
+        
+        String ActualHospitalreadmission=driver.findElement(By.id("hospital_readmission")).getText();
+        
+        if(ActualHospitalreadmission.equals(ExpectedHospitalreadmission)) {
+        	System.out.println("Test_006 Passed- Hospital_readmission checkbox has been selected");
+        	Testpassed++;
+        }
+        else {
+        	System.out.println("Test_006 failed- Hospital_readmission checkbox has not been selected");
+        	Testfailed++;
+        }
+        
+        //Healthcare Program
+        
+        String ActualHealthcareprogram=driver.findElement(By.id("program")).getText();
+        if(ActualHealthcareprogram.equals(ExpectedHealthcareprogram)) {
+           System.out.println("Test_007 Passed- Expected Healthcare program radio button has been selected");
+           Testpassed++;
+        }
+        else {
+        	System.out.println("Test_007 failed- Expected Healthcare program radio button has not been selected");
+        	Testfailed++;
+        }
+        
+        //visit date
+        
+        String Actualvisitdate=driver.findElement(By.id("visit_date")).getText();
+        if(Actualvisitdate.equals(ExpectedVisitdate)) {
+        	System.out.println("Test_008 Passed- Expected visit date has been selected in calendar");
+        	Testpassed++;
+        }
+        else {
+        	System.out.println("Test_008 Failed- Expected visit date has not been selected in calendar");
+        	Testfailed++;
+        }
+        
+        //Comment
+        String Actualcomment=driver.findElement(By.id("comment")).getText();
+        if(Actualcomment.equals(Expectedcomment)) {
+        	System.out.println("Test_009 Passed- Expected comment has been entered in comment text field");
+        	Testpassed++;
+        }
+        else {
+        	System.out.println("Test_009 Failed- Expected comment has not been entered in comment text field");
+        	Testfailed++;
+        }
+        Thread.sleep(3000);
+        driver.findElement(By.xpath("//a[text()='Go to Homepage']")).click();
+        
+        //Go to Homepage button
+        
+        String ActualHomepageurl=driver.getCurrentUrl();
+        if(ActualHomepageurl.equals(baseurl)) {
+        	System.out.println("Test_010 Passed- Navigates back to Homepageurl");
+        	Testpassed++;
+        }
+        else {
+        	System.out.println("Test_010 Failed- Does not Navigates back to Homepageurl");
+        	Testfailed++;
+        }
+        //Test Report
+        System.out.println("****************************************************************");
+        System.out.println("Out of 10 Testcases "+Testpassed+" got Passed");
+        System.out.println("Out of 10 Testcases "+Testfailed+" got Failed");
+        
+	}
+	}
